@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/firebase_database_url,@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id,@string/default_web_client_id">
+  <string name="firebase_database_url" translatable="false">https://falldices-default-rtdb.europe-west1.firebasedatabase.app</string>
+  <string name="gcm_defaultSenderId" translatable="false">330933306908</string>
+  <string name="google_storage_bucket" translatable="false">falldices.appspot.com</string>
+  <string name="project_id" translatable="false">falldices</string>
+  <string name="google_api_key" translatable="false">AIzaSyDKOZQfAQboDUBs5gad1IQuJreDTnmpl_k</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDKOZQfAQboDUBs5gad1IQuJreDTnmpl_k</string>
+  <string name="google_app_id" translatable="false">1:330933306908:android:7061cd926211fcd590c1d9</string>
+  <string name="default_web_client_id" translatable="false">330933306908-agf10a4f1pn91b5dlclk53thls1mulug.apps.googleusercontent.com</string>
+</resources>
