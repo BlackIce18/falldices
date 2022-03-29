@@ -1,12 +1,8 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Firebase;
 using Firebase.Auth;
 using TMPro;
-using System;
-using Firebase.Firestore;
-using Firebase.Extensions;
 
 public class AuthManager : MonoBehaviour
 {
@@ -35,7 +31,6 @@ public class AuthManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _warningTextRegister;
 
     [SerializeField] private FirestoreDataBase _db;
-
     public string GetUserId() { 
         return _user.UserId; 
     }
@@ -114,7 +109,7 @@ public class AuthManager : MonoBehaviour
                 //User is now logged in
                 //Now get the result
                 _user = LoginTask.Result;
-                _db.SetActiveUser(_user);
+                _db.OnUserLogin(_user);
                 Debug.LogFormat("User signed in successfully: {0} ({1})", _user.DisplayName, _user.Email);
                 _warningTextLogin.text = "";
                 Debug.Log(_user.UserId);
@@ -157,7 +152,7 @@ public class AuthManager : MonoBehaviour
                 FirebaseException firebaseEx = RegisterTask.Exception.GetBaseException() as FirebaseException;
                 AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
 
-                string message = "Register Failed!";
+                string message = "Регистрация не удалась";
                 switch (errorCode)
                 {
                     case AuthError.MissingEmail:
