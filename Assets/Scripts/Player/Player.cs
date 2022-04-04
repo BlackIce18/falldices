@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using TMPro;
 // FieldCells
 public enum PlayerAnimationDirection
 { 
@@ -11,22 +10,16 @@ public enum PlayerAnimationDirection
 }
 
 [RequireComponent(typeof(PlayerMovement))]
+[RequireComponent(typeof(PlayerColoring))]
+[RequireComponent(typeof(PlayerBalance))]
 public class Player : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI _moneyText;
-    [SerializeField] private GameField _gameField;
-    [SerializeField] private Material _userColor; // Выбранный пользователем цвет
     private string _nickname = "";
-    private int _money = 1000;
-    public int Money {
-        get { return _money; }
-        set { 
-            _money = value;
-            _moneyText.text = _money.ToString();
-        }
-    }
-    private PlayerMovement _playerMovement => GetComponent<PlayerMovement>();
-    public int _position = 0;
+    private bool _isBankrupt = false;
+
+    private PlayerBalance _playerBalance;
+    private PlayerMovement _playerMovement;
+    private int _position = 0;
 
     public int Position 
     {
@@ -52,22 +45,27 @@ public class Player : MonoBehaviour
                
         } 
     }
-    private void Start()
+
+    public PlayerBalance PlayerBalance
     {
-        _moneyText.text = Money.ToString();    
+        get { return _playerBalance; }
+        set { _playerBalance = value; }
+    }
+
+    private void Awake()
+    {
+        _playerMovement = GetComponent<PlayerMovement>();
+        _playerBalance = GetComponent<PlayerBalance>();
     }
 
     public void Move(int movesCount) 
     {
         StartCoroutine(_playerMovement.Move(movesCount));
-        if (Position + movesCount >= _gameField.FieldCellsCount) 
+        if (Position + movesCount >= GameField.gameFieldSingleton.FieldCellsCount) 
         {
-            _gameField.AddCircleMoney();
+            Bank bank = GameField.gameFieldSingleton.Bank;
+            _playerBalance.AddMoney(bank.CircleMoneyForPlayer);
+            bank.AddMoneyToPlayerBalance(_playerBalance, bank.CircleMoneyForPlayer);
         }
-    }
-
-    public void AddMoney(int money)
-    {
-        Money += money;
     }
 }

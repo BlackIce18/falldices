@@ -1,13 +1,11 @@
 using System.Collections;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
 [RequireComponent(typeof(Player))]
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private GameField _gameField; // Ячейки поля (point)
     private Player _player => GetComponent<Player>();
     private int _movesLeft = 0; // Осталось ходов
 
@@ -85,10 +83,10 @@ public class PlayerMovement : MonoBehaviour
 
         while (MovesCount > 0)
         {
-            PlayerAnimationDirection direction = _gameField.GetPointPlayerAnimationDirection(_player.Position);
+            PlayerAnimationDirection direction = GameField.gameFieldSingleton.GetPointPlayerAnimationDirection(_player.Position);
 
             Vector3 playerPosition = _player.transform.localPosition;
-            Vector3 nextPointPosition = _gameField.GetPointPosition(_player.Position + 1);
+            Vector3 nextPointPosition = GameField.gameFieldSingleton.GetPointPosition(_player.Position + 1);
 
             if (direction == PlayerAnimationDirection.Up)
             {
@@ -108,7 +106,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
 
-            if (_player.Position + 1 >= _gameField.FieldCellsCount)
+            if (_player.Position + 1 >= GameField.gameFieldSingleton.FieldCellsCount)
             {
                 _player.Position = 0;
             }
