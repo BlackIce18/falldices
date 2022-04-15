@@ -37,7 +37,7 @@ public class FirestoreDataBase : MonoBehaviour
             if (_dependencyStatus == DependencyStatus.Available)
             {
                 //If they are avalible Initialize Firebase
-                InitializeFirebase();
+                InitializeFirebase(); 
             }
             else
             {
