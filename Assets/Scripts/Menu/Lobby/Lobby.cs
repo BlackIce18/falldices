@@ -5,7 +5,7 @@ using UnityEngine;
 public class Lobby : MonoBehaviour
 {
     [SerializeField] private GameObject _lobbyUserItemPrefab;
-    [SerializeField] private PrepareSingleGame _prepareSingleGame;
+    [SerializeField] private PrepareGame _prepareSingleGame;
     [SerializeField] private FirestoreDataBase _db;
 
     private void OnEnable()
@@ -25,5 +25,6 @@ public class Lobby : MonoBehaviour
         lobbyUserItemPrefab.Nickname.color = color;
         lobbyUserItemPrefab.Nickname.text = nickname;
         lobbyUserItemPrefab.PlayerIcon.sprite = _prepareSingleGame.ModelsAssociation.GetModelById(modelId).Sprite;
+        lobbyUserItemPrefab.PlayerIcon.preserveAspect = true;
     }
 }
