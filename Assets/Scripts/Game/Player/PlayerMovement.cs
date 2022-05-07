@@ -39,10 +39,10 @@ public class PlayerMovement : MonoBehaviour
     // Анимация перемещения вверх 
     IEnumerator UpMoveAnimation(Vector3 playerPosition, Vector3 nextPointPosition)
     {
-        transform.DORotate(new Vector3(-25, 0, 0), 0.5f);
+        //transform.DORotate(new Vector3(-25, 0, 0), 0.5f);
         Tween myTween = transform.DOMove(new Vector3(nextPointPosition.x, 2.25f, (playerPosition.z - nextPointPosition.z) / 2 + nextPointPosition.z), 0.25f);
         yield return myTween.WaitForCompletion();
-        transform.DORotate(new Vector3(0, 0, 0), 0.5f);
+        //transform.DORotate(new Vector3(0, 0, 0), 0.5f);
         myTween = transform.DOMove(new Vector3(nextPointPosition.x, 0.3f, nextPointPosition.z), 0.25f);
         yield return myTween.WaitForCompletion();
     }
@@ -50,10 +50,10 @@ public class PlayerMovement : MonoBehaviour
     // Анимация перемещения вправо 
     IEnumerator RightMoveAnimation(Vector3 playerPosition, Vector3 nextPointPosition)
     {
-        transform.DORotate(new Vector3(0, 0, 25), 0.5f);
+        //transform.DORotate(new Vector3(0, 0, 25), 0.5f);
         Tween myTween = transform.DOMove(new Vector3((playerPosition.x - nextPointPosition.x) / 2 + nextPointPosition.x, 2.25f, nextPointPosition.z), 0.25f);
         yield return myTween.WaitForCompletion();
-        transform.DORotate(new Vector3(0, 0, 0), 0.5f);
+        //transform.DORotate(new Vector3(0, 0, 0), 0.5f);
         myTween = transform.DOMove(new Vector3(nextPointPosition.x, 0.3f, nextPointPosition.z), 0.25f);
         yield return myTween.WaitForCompletion();
     }
@@ -61,10 +61,10 @@ public class PlayerMovement : MonoBehaviour
     // Анимация перемещения вниз 
     IEnumerator DownMoveAnimation(Vector3 playerPosition, Vector3 nextPointPosition)
     {
-        transform.DORotate(new Vector3(25, 0, 0), 0.5f);
+        //transform.DORotate(new Vector3(25, 0, 0), 0.5f);
         Tween myTween = transform.DOMove(new Vector3((playerPosition.x - nextPointPosition.x) / 2 + nextPointPosition.x, 2.25f, nextPointPosition.z), 0.25f);
         yield return myTween.WaitForCompletion();
-        transform.DORotate(new Vector3(0, 0, 0), 0.5f);
+        //transform.DORotate(new Vector3(0, 0, 0), 0.5f);
         myTween = transform.DOMove(new Vector3(nextPointPosition.x, 0.3f, nextPointPosition.z), 0.25f);
         yield return myTween.WaitForCompletion();
     }
@@ -72,16 +72,17 @@ public class PlayerMovement : MonoBehaviour
     // Анимация перемещения влево 
     IEnumerator LeftMoveAnimation(Vector3 playerPosition, Vector3 nextPointPosition)
     {
-        transform.DORotate(new Vector3(0, 0, -25), 0.5f);
+        //transform.DORotate(new Vector3(0, 0, -25), 0.5f);
         Tween myTween = transform.DOMove(new Vector3((playerPosition.x - nextPointPosition.x) / 2 + nextPointPosition.x, 2.25f, nextPointPosition.z), 0.25f);
         yield return myTween.WaitForCompletion();
-        transform.DORotate(new Vector3(0, 0, 0), 0.5f);
+        //transform.DORotate(new Vector3(0, 0, 0), 0.5f);
         myTween = transform.DOMove(new Vector3(nextPointPosition.x, 0.3f, nextPointPosition.z), 0.25f);
         yield return myTween.WaitForCompletion();
     }
 
     public IEnumerator Move(int movesCount)
     {
+        RotateGameScene.ProhibitRotate();
         MovesCount = movesCount;
 
         while (MovesCount > 0)
@@ -121,6 +122,7 @@ public class PlayerMovement : MonoBehaviour
 
             MovesCount--;
         }
+        RotateGameScene.AllowRotate();
         GameField.gameFieldSingleton.ShowCellButton();
     }
 

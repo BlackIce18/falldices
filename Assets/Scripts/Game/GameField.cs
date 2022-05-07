@@ -139,7 +139,13 @@ public class GameField : MonoBehaviour
         {
             return false;
         }
-        return _activePlayer.TryToBuyEnterprise(enterprise);
+        bool isBuyed = _activePlayer.TryToBuyEnterprise(enterprise);
+        if (isBuyed)
+        {
+            _fieldCells[_activePlayer.Position].IsAvailableToBuild = false;
+            _activePlayerMoney.text = _activePlayer.PlayerBalance.Money.ToString();
+        }
+        return isBuyed;
     }
 
     public void ShowCellButton()

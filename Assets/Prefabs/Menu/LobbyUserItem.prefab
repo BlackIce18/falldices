@@ -127,7 +127,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0668de10d6d4c944ab6be09a2d2d1cf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerIcon: {fileID: 8666334376566107851}
+  color:
+    serializedVersion: 2
+    rgba: 0
+  model:
+    Id: 0
+    Sprite: {fileID: 0}
+    Prefab: {fileID: 0}
+  _icon: {fileID: 8666334376566107851}
   _nickname: {fileID: 8666334378508531968}
 --- !u!222 &8666334377776229736
 CanvasRenderer:

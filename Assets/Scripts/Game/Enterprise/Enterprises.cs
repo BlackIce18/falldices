@@ -84,6 +84,7 @@ public class Enterprises : MonoBehaviour
                 {
                     _gameField.ShowCellButton();
                     enterprisePrefab.Buy.enabled = false;
+                    enterprisePrefab.PriceText.text = "Куплено";
                     _buyWindow.SetActive(false);
                     _buildButton.SetActive(false);
                     BuildEnterprise(enterprise);

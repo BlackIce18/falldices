@@ -6,6 +6,7 @@ TagManager:
   tags:
   - AuthManager
   - FirebaseDB
+  - GameCreate
   layers:
   - Default
   - TransparentFX

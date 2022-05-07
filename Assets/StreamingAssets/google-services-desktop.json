@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:330933306908:android:7061cd926211fcd590c1d9",
+        "mobilesdk_app_id": "1:330933306908:android:8745fd8e8980d2d890c1d9",
         "android_client_info": {
-          "package_name": "com.SevenLetter.FallDices"
+          "package_name": "com.SevenLetters.FallDices"
         }
       },
       "oauth_client": [
@@ -21,7 +21,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDKOZQfAQboDUBs5gad1IQuJreDTnmpl_k"
+          "current_key": "AIzaSyCjBOKe7yz5ayiQQado_5w-m_Agw72uLfg"
         }
       ],
       "services": {

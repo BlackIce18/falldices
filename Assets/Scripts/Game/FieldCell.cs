@@ -8,7 +8,11 @@ public class FieldCell : MonoBehaviour
     [SerializeField] private bool _isAvailableToBuild = true;
     [SerializeField] private GameObject _UIToShow;
     public PlayerAnimationDirection Direction => _animationDirection;
-    public bool IsAvailableToBuild => _isAvailableToBuild;
+    public bool IsAvailableToBuild
+    {
+        get { return _isAvailableToBuild; }
+        set { _isAvailableToBuild = value; }
+    }
     public GameObject UIToShow => _UIToShow;
     public GameObject TileObject => _tileObject;
 }

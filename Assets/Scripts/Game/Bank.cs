@@ -28,6 +28,11 @@ public class Bank : MonoBehaviour
     [SerializeField] private int _circleMoneyForPlayer = 1000;
     public int CircleMoneyForPlayer { get { return _circleMoneyForPlayer; } }
 
+    private void Awake()
+    {
+        _circleMoneyForPlayer = GameData.moneyForCircle;
+    }
+
     public void AddMoneyToPlayerBalance(PlayerBalance playerBalance, int money)
     {
         foreach(Balance balance in _playerBalances)

@@ -51,7 +51,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _price: {fileID: 6475720783334429105}
-  _imageGems: {fileID: 6475720783353242550}
+  _picture: {fileID: 6475720783353242550}
+  _imageGems: {fileID: 6475720783636906905}
   _button: {fileID: 6475720784341386743}
 --- !u!1 &6475720783334429111
 GameObject:

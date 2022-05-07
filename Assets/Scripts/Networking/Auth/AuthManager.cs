@@ -3,6 +3,8 @@ using UnityEngine;
 using Firebase;
 using Firebase.Auth;
 using TMPro;
+using Firebase.Firestore;
+using System;
 
 public class AuthManager : MonoBehaviour
 {
@@ -10,10 +12,8 @@ public class AuthManager : MonoBehaviour
     [SerializeField] private GameObject _authorization;
 
     [Header("Firebase")]
-    [SerializeField] private FirebaseAuth _auth;
+    [SerializeField] private Firebase.Auth.FirebaseAuth _auth;
     public FirebaseAuth AuthSetter { set => _auth = value; }
-    [SerializeField] private FirebaseUser _user;
-    public FirebaseUser GetAuthentificatedUser => _user;
 
 
     [Header("Login")]
@@ -31,16 +31,18 @@ public class AuthManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _warningTextRegister;
 
     [SerializeField] private FirestoreDataBase _db;
-    public string GetUserId() { 
-        return _user.UserId; 
-    }
 
+    private void Awake()
+    {
+        FirebaseFirestore.DefaultInstance.Settings.PersistenceEnabled = false;
+        _auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+    }
     //Function for the login button
     public void LoginButton()
     {
         //Call the login coroutine passing the email and password
         StartCoroutine(Login(_emailLogin.text, _passwordLogin.text));
-    }
+    }   
     //Function for the register button
     public void RegisterButton()
     {
@@ -65,60 +67,62 @@ public class AuthManager : MonoBehaviour
         else
         {
             //Call the Firebase auth signin function passing the email and password
-            var LoginTask = _auth.SignInWithEmailAndPasswordAsync(_email, _password);
-            //Wait until the task completes
-            yield return new WaitUntil(predicate: () => LoginTask.IsCompleted);
 
-            if (LoginTask.Exception != null)
-            {
-                //If there are errors handle them
-                Debug.LogWarning(message: $"Failed to register task with {LoginTask.Exception}");
-                FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
-                AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
+                var LoginTask = _auth.SignInWithEmailAndPasswordAsync(_email, _password);
+                //Wait until the task completes
+                yield return new WaitUntil(predicate: () => LoginTask.IsCompleted);
 
-                string message = "Login Failed!";
-                switch (errorCode)
+                if (LoginTask.Exception != null)
                 {
-                    case AuthError.MissingEmail:
-                        message = "Пропущен Email";
-                        break;
-                    case AuthError.MissingPassword:
-                        message = "Пропущен пароль";
-                        break;
-                    case AuthError.WrongPassword:
-                        message = "Не верный пароль";
-                        break;
-                    case AuthError.InvalidEmail:
-                        message = "Не верный Email";
-                        break;
-                    case AuthError.UserNotFound:
-                        message = "Аккаунт не существует";
-                        break;
+                    //If there are errors handle them
+                    Debug.LogWarning(message: $"Failed to register task with {LoginTask.Exception}");
+                    FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
+                    AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
+
+                    string message = "Login Failed!";
+                    switch (errorCode)
+                    {
+                        case AuthError.MissingEmail:
+                            message = "Пропущен Email";
+                            break;
+                        case AuthError.MissingPassword:
+                            message = "Пропущен пароль";
+                            break;
+                        case AuthError.WrongPassword:
+                            message = "Не верный пароль";
+                            break;
+                        case AuthError.InvalidEmail:
+                            message = "Не верный Email";
+                            break;
+                        case AuthError.UserNotFound:
+                            message = "Аккаунт не существует";
+                            break;
+                    }
+                    _warningTextLogin.text = message;
                 }
-                _warningTextLogin.text = message;
-            }
-          /*  else if (LoginTask.Result.IsEmailVerified == false)
-            {
-                Debug.Log("The user has an unconfirmed email");
-                _warningTextLogin.text = "Не подтвержденный email. Письмо с активацией выслано на почту.";
-                ConfirmEmail();
-                _auth.SignOut();
-            }*/
-            else
-            {
-                //User is now logged in
-                //Now get the result
-                _user = LoginTask.Result;
-                _db.OnUserLogin(_user);
-                Debug.LogFormat("User signed in successfully: {0} ({1})", _user.DisplayName, _user.Email);
-                _warningTextLogin.text = "";
-                Debug.Log(_user.UserId);
-                _gameMenu.SetActive(true);
-                _authorization.SetActive(false);
-                //confirmLoginText.text = "Logged In";
-            }
+                /*else if (LoginTask.Result.IsEmailVerified == false)
+                {
+                    Debug.Log("The user has an unconfirmed email");
+                    _warningTextLogin.text = "Не подтвержденный email. Письмо с активацией выслано на почту.";
+                    ConfirmEmail();
+                    _auth.SignOut();
+                }*/
+                else
+                {
+                    //User is now logged in
+                    //Now get the result
+                    _db.OnUserLogin(LoginTask.Result);
+                    Debug.LogFormat("User signed in successfully: {0} ({1})", LoginTask.Result.DisplayName, LoginTask.Result.Email);
+                    _warningTextLogin.text = "";
+                    Debug.Log(LoginTask.Result.UserId);
+                    _gameMenu.SetActive(true);
+                    _authorization.SetActive(false);
+                    //confirmLoginText.text = "Logged In";
+                }
         }
     }
+
+
 
     private IEnumerator Register(string _email, string _password, string _username)
     {
@@ -139,7 +143,6 @@ public class AuthManager : MonoBehaviour
         }
         else
         {
-            Debug.Log(_auth);
             //Call the Firebase auth signin function passing the email and password
             var RegisterTask = _auth.CreateUserWithEmailAndPasswordAsync(_email, _password);
             //Wait until the task completes
@@ -152,9 +155,9 @@ public class AuthManager : MonoBehaviour
                 FirebaseException firebaseEx = RegisterTask.Exception.GetBaseException() as FirebaseException;
                 AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
 
-                string message = "Регистрация не удалась";
-                switch (errorCode)
-                {
+                string message = "Login Failed!";
+                switch (errorCode) 
+                { 
                     case AuthError.MissingEmail:
                         message = "Пропущен Email";
                         break;
@@ -174,16 +177,15 @@ public class AuthManager : MonoBehaviour
             {
                 //User has now been created
                 //Now get the result
-                _user = RegisterTask.Result;
                 ConfirmEmail();
 
-                if (_user != null)
+                if (RegisterTask.Result != null)
                 {
                     //Create a user profile and set the username
                     UserProfile profile = new UserProfile { DisplayName = _username };
                     
                     //Call the Firebase auth update user profile function passing the profile with the username
-                    var ProfileTask = _user.UpdateUserProfileAsync(profile);
+                    var ProfileTask = RegisterTask.Result.UpdateUserProfileAsync(profile);
                     //Wait until the task completes
                     yield return new WaitUntil(predicate: () => ProfileTask.IsCompleted);
 
@@ -199,8 +201,8 @@ public class AuthManager : MonoBehaviour
                     {
                         //Username is now set
                         //Now return to login screen
+                        _db.OnUserLogin(RegisterTask.Result);
                         _db.AddToCollection(InitUser());
-
                         _loginMenu.SetActive(true);
                         _registerMenu.SetActive(false);
                         _warningTextRegister.text = "";
@@ -212,10 +214,11 @@ public class AuthManager : MonoBehaviour
 
     private UserFirebaseDataConstruct InitUser()
     {
-        UserFirebaseDataConstruct user = new UserFirebaseDataConstruct();
-        user.Money = 0;
-        user.Nickname = _usernameRegister.text;
-        return user;
+        //Обязательно в таком формате
+        UserFirebaseDataConstruct userFirebaseDataConstruct = new UserFirebaseDataConstruct();
+        userFirebaseDataConstruct.Money = 0;
+        userFirebaseDataConstruct.Nickname = _usernameRegister.text;
+        return userFirebaseDataConstruct;
     }
 
     private void ConfirmEmail()

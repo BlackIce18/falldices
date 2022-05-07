@@ -9,6 +9,7 @@ public class TogglerUI : MonoBehaviour
     [SerializeField] private Image _Background;
     [SerializeField] private Color32 _BackgroundDefaultColor;
     [SerializeField] private Color32 _BackgroundTargetColor;
+    [SerializeField] private AudioSource _audio;
 
     private float _togglerWidth => _toggle.GetComponent<RectTransform>().rect.width;
     private float _handlerWidth => _handler.rect.width;
@@ -24,11 +25,13 @@ public class TogglerUI : MonoBehaviour
         {
             ChangeBackgroundColor(_BackgroundTargetColor);
             ChangeHandlerPosition(new Vector3(_togglerWidth - _handlerWidth / 2, _handler.localPosition.y, _handler.localPosition.z));
+            _audio.mute = false;
         }
         else
         {
             ChangeBackgroundColor(_BackgroundDefaultColor);
             ChangeHandlerPosition(new Vector3(_handlerWidth / 2, _handler.localPosition.y, _handler.localPosition.z));
+            _audio.mute = true;
         }
     }
 

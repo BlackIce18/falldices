@@ -16,7 +16,7 @@ public enum PlayerAnimationDirection
 public class Player : MonoBehaviour
 {
     [SerializeField] private string _nickname = "";
-    public string NickName { get { return _nickname; } }
+    public string NickName { get { return _nickname; } set { _nickname = value; } }
     private bool _isBankrupt = false;
 
     private PlayerBalance _playerBalance;

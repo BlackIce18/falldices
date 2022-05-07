@@ -24,5 +24,6 @@ public class ShopItem : MonoBehaviour
     public void ChangeSprite(Sprite sprite)
     {
         _picture.sprite = sprite;
+        _picture.preserveAspect = true;
     }
 }

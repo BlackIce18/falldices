@@ -34,7 +34,7 @@ public class SceneChanger : MonoBehaviour
 
         _asyncOperation = SceneManager.LoadSceneAsync(sceneID);
         _asyncOperation.allowSceneActivation = false;
-        while (!_asyncOperation.isDone)
+       /* while (!_asyncOperation.isDone)
         {
 
             if (_asyncOperation.progress >= 0.9f)
@@ -43,6 +43,6 @@ public class SceneChanger : MonoBehaviour
             }
 
             yield return null;
-        }
+        }*/
     }
 }

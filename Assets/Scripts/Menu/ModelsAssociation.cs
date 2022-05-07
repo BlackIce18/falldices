@@ -10,6 +10,7 @@ public struct Models
 }
 public class ModelsAssociation : MonoBehaviour
 {
+    public static ModelsAssociation ModelsAssociationSingleton;
     [SerializeField] private Models[] _models;
 
     public Models GetModelById(int id)
@@ -20,5 +21,18 @@ public class ModelsAssociation : MonoBehaviour
                 return _models[i];
         }
         return _models[0];
+    }
+
+    private void Awake()
+    {
+         if (!ModelsAssociationSingleton)
+         {
+            ModelsAssociationSingleton = this;
+             DontDestroyOnLoad(transform.gameObject);
+         }
+         else
+         {
+             Destroy(gameObject);
+         }
     }
 }
