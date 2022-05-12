@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 // FieldCells
 public enum PlayerAnimationDirection
@@ -19,9 +20,9 @@ public class Player : MonoBehaviour
     public string NickName { get { return _nickname; } set { _nickname = value; } }
     private bool _isBankrupt = false;
 
-    private PlayerBalance _playerBalance;
-    private PlayerMovement _playerMovement;
-    private PlayerOwnership _playerOwnership;
+    private PlayerBalance _balance;
+    private PlayerMovement _movement;
+    private PlayerOwnership _ownership;
     private int _position = 0;
 
     private Color32 _color;
@@ -51,12 +52,12 @@ public class Player : MonoBehaviour
         } 
     }
 
-    public PlayerBalance PlayerBalance
+    public PlayerBalance Balance
     {
-        get { return _playerBalance; }
-        set { _playerBalance = value; }
+        get { return _balance; }
+        set { _balance = value; }
     }
-
+    public PlayerOwnership Ownership => _ownership;
     public Color32 Color
     {
         get { return _color; }
@@ -65,30 +66,51 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        _playerMovement = GetComponent<PlayerMovement>();
-        _playerBalance = GetComponent<PlayerBalance>();
-        _playerOwnership = GetComponent<PlayerOwnership>();
+        _movement = GetComponent<PlayerMovement>();
+        _balance = GetComponent<PlayerBalance>();
+        _ownership = GetComponent<PlayerOwnership>();
     }
 
-    public void Move(int movesCount) 
+    public IEnumerator Move(int movesCount) 
     {
-        StartCoroutine(_playerMovement.Move(movesCount));
-        if (Position + movesCount >= GameField.gameFieldSingleton.FieldCellsCount) 
+        int startPosition = Position;
+        yield return StartCoroutine(_movement.Move(movesCount));
+        yield return StartCoroutine(WorkWithPlayerPositionAndBalance(startPosition, movesCount));
+    }
+
+    private IEnumerator WorkWithPlayerPositionAndBalance(int startPosition, int movesCount)
+    {
+        FieldCell fieldCell = GameField.gameFieldSingleton.GetActivePlayerCell();
+        int fieldSize = GameField.gameFieldSingleton.FieldCellsCount;
+        if (startPosition + movesCount >= fieldSize)
         {
             Bank bank = GameField.gameFieldSingleton.Bank;
-            _playerBalance.AddMoney(bank.CircleMoneyForPlayer);
-            bank.AddMoneyToPlayerBalance(_playerBalance, bank.CircleMoneyForPlayer);
+            Balance.AddMoney(bank.CircleMoneyForPlayer);
+            GameField.gameFieldSingleton.activePlayerMoney.text = Balance.Money.ToString();
+            bank.AddMoneyToPlayerBalance(Balance, bank.CircleMoneyForPlayer);
+            GameField.gameFieldSingleton.gameWindows.ShowWindow(WindowsEnum.NewCircle);
         }
+
+        if(fieldCell.owner == null)
+        {
+            GameField.gameFieldSingleton.ShowCellButton();
+        }
+        else if (fieldCell.owner != null && fieldCell.owner != this)
+        {
+            Balance.AddMoney(-fieldCell.enterprise.CurrentRentPrice);
+            fieldCell.owner.Balance.AddMoney(fieldCell.enterprise.CurrentRentPrice);
+        }
+        yield return fieldCell;
     }
 
     public bool TryToBuyEnterprise(Enterprise enterprise)
     {
         if (enterprise.IsAvailable)
         {
-            bool isBuyed = _playerBalance.TryBuy(enterprise.Price);
+            bool isBuyed = _balance.TryBuy(enterprise.Price);
             if (isBuyed)
             {
-                _playerOwnership.AddToOwn(enterprise);
+                _ownership.AddToOwn(enterprise);
                 enterprise.SetUnavailableToBuy();
                 return true;
             }

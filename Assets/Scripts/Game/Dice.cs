@@ -10,7 +10,7 @@ public class Dice : MonoBehaviour
         return Random.Range(1, 7);
     }
 
-    public int[] RollDices() 
+    public int RollDices() 
     {
         int[] array = new int[2];
         array[0] = RollDice();
@@ -19,7 +19,7 @@ public class Dice : MonoBehaviour
         _dicesModel[0].Play("Roll_"+array[0]);
         _dicesModel[1].Play("Roll_" + array[1]);
 
-        return array;
+        return array[0]+array[1];
     }
 
     public void HideDices()

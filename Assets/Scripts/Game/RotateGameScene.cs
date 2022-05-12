@@ -3,33 +3,7 @@ using UnityEngine;
 public class RotateGameScene : MonoBehaviour
 {
     private static bool canRotate = true;
-    /*public Transform Target;
-    public Transform Targe1;
-    public float speedRotateX = 5;
-    public float speedRotateY = 5;
- 
-    void Update()
-    {
-        if (canRotate)
-        {
-            if (!Input.GetMouseButton(0))
-                return;
 
-            float rotX = Input.GetAxis("Mouse X") * speedRotateX * Mathf.Deg2Rad;
-            float rotY = Input.GetAxis("Mouse Y") * speedRotateY * Mathf.Deg2Rad;
-
-            if (Mathf.Abs(rotX) > Mathf.Abs(rotY))
-                Target.Rotate(Target.up, -rotX);
-            else
-            {
-                var prev = Target.rotation;
-                Target.Rotate(Camera.main.transform.right, rotY);
-                if (Vector3.Dot(Target.up, Camera.main.transform.up) < 0.5f)
-                    Target.rotation = prev;
-            }
-            Camera.main.transform.LookAt(Targe1);
-        }
-    }*/
     public Transform target;
     public Camera mainCamera;
     [Range(0.1f, 5f)]
@@ -45,17 +19,17 @@ public class RotateGameScene : MonoBehaviour
     public RotateMethod rotateMethod = RotateMethod.Mouse;
 
 
-    private Vector2 swipeDirection; //swipe delta vector2
-    private Quaternion cameraRot; // store the quaternion after the slerp operation
-    private Touch touch;
-    private float distanceBetweenCameraAndTarget;
+    private Vector2 _swipeDirection; //swipe delta vector2
+    private Quaternion _cameraRot; // store the quaternion after the slerp operation
+    private Touch _touch;
+    private float _distanceBetweenCameraAndTarget;
 
-    private float minXRotAngle = -80; //min angle around x axis
-    private float maxXRotAngle = 80; // max angle around x axis
+    private float _minXRotAngle = -80; //min angle around x axis
+    private float _maxXRotAngle = 80; // max angle around x axis
 
     //Mouse rotation related
-    private float rotX; // around x
-    private float rotY; // around y
+    private float _rotX; // around x
+    private float _rotY; // around y
     private void Awake()
     {
         if (mainCamera == null)
@@ -69,94 +43,98 @@ public class RotateGameScene : MonoBehaviour
     void Start()
     {
         SetCamPos(); 
-        distanceBetweenCameraAndTarget = Vector3.Distance(mainCamera.transform.position, target.position);
+        _distanceBetweenCameraAndTarget = Vector3.Distance(mainCamera.transform.position, target.position);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (rotateMethod == RotateMethod.Mouse)
+        if (canRotate)
         {
-            if (Input.GetMouseButton(0))
+            if (rotateMethod == RotateMethod.Mouse)
             {
-                rotX += -Input.GetAxis("Mouse Y") * mouseRotateSpeed; // around X
-                rotY += Input.GetAxis("Mouse X") * mouseRotateSpeed;
-                        Vector3 dir = new Vector3(0, 0, -distanceBetweenCameraAndTarget); //assign value to the distance between the maincamera and the target
-
-        Quaternion newQ; // value equal to the delta change of our mouse or touch position
-        if (rotateMethod == RotateMethod.Mouse)
-        {
-            newQ = Quaternion.Euler(rotX, rotY, 0); //We are setting the rotation around X, Y, Z axis respectively
-        }
-        else
-        {
-            newQ = Quaternion.Euler(swipeDirection.y, -swipeDirection.x, 0);
-        }
-        cameraRot = Quaternion.Slerp(cameraRot, newQ, slerpValue);  //let cameraRot value gradually reach newQ which corresponds to our touch
-        mainCamera.transform.position = target.position + cameraRot * dir;
-        mainCamera.transform.LookAt(target.position);
-            }
-
-            if (rotX < minXRotAngle)
-            {
-                rotX = minXRotAngle;
-            }
-            else if (rotX > maxXRotAngle)
-            {
-                rotX = maxXRotAngle;
-            }
-        }
-        else if (rotateMethod == RotateMethod.Touch)
-        {
-            if (Input.touchCount > 0)
-            {
-                touch = Input.GetTouch(0);
-                if (touch.phase == TouchPhase.Began)
+                if (Input.GetMouseButton(0))
                 {
-                    //Debug.Log("Touch Began");
+                    _rotX += -Input.GetAxis("Mouse Y") * mouseRotateSpeed; // around X
+                    _rotY += Input.GetAxis("Mouse X") * mouseRotateSpeed;
+                    Vector3 dir = new Vector3(0, 0, -_distanceBetweenCameraAndTarget); //assign value to the distance between the maincamera and the target
 
+                    Quaternion newQ; // value equal to the delta change of our mouse or touch position
+                    if (rotateMethod == RotateMethod.Mouse)
+                    {
+                        newQ = Quaternion.Euler(_rotX, _rotY, 0); //We are setting the rotation around X, Y, Z axis respectively
+                    }
+                    else
+                    {
+                        newQ = Quaternion.Euler(_swipeDirection.y, -_swipeDirection.x, 0);
+                    }
+                    _cameraRot = Quaternion.Slerp(_cameraRot, newQ, slerpValue);  //let cameraRot value gradually reach newQ which corresponds to our touch
+                    mainCamera.transform.position = target.position + _cameraRot * dir;
+                    mainCamera.transform.LookAt(target.position);
                 }
-                else if (touch.phase == TouchPhase.Moved)
+
+                if (_rotX < _minXRotAngle)
                 {
-                    swipeDirection += touch.deltaPosition * Time.deltaTime * touchRotateSpeed;
+                    _rotX = _minXRotAngle;
                 }
-                else if (touch.phase == TouchPhase.Ended)
+                else if (_rotX > _maxXRotAngle)
                 {
-                    //Debug.Log("Touch Ended");
+                    _rotX = _maxXRotAngle;
                 }
             }
-
-            if (swipeDirection.y < minXRotAngle)
+            else if (rotateMethod == RotateMethod.Touch)
             {
-                swipeDirection.y = minXRotAngle;
-            }
-            else if (swipeDirection.y > maxXRotAngle)
-            {
-                swipeDirection.y = maxXRotAngle;
-            }
+                if (Input.touchCount > 0)
+                {
+                    _touch = Input.GetTouch(0);
+                    if (_touch.phase == TouchPhase.Began)
+                    {
+                        //Debug.Log("Touch Began");
+
+                    }
+                    else if (_touch.phase == TouchPhase.Moved)
+                    {
+                        _swipeDirection += _touch.deltaPosition * Time.deltaTime * touchRotateSpeed;
+                    }
+                    else if (_touch.phase == TouchPhase.Ended)
+                    {
+                        //Debug.Log("Touch Ended");
+                    }
+                }
+
+                if (_swipeDirection.y < _minXRotAngle)
+                {
+                    _swipeDirection.y = _minXRotAngle;
+                }
+                else if (_swipeDirection.y > _maxXRotAngle)
+                {
+                    _swipeDirection.y = _maxXRotAngle;
+                }
 
 
+            }
         }
-
     }
 
     private void LateUpdate()
     {
-        Vector3 dir = new Vector3(-5, distanceBetweenCameraAndTarget, -5); //assign value to the distance between the maincamera and the target
-
-        Quaternion newQ; // value equal to the delta change of our mouse or touch position
-        if (rotateMethod == RotateMethod.Mouse)
+        if(canRotate)
         {
-            newQ = Quaternion.Euler(rotX, rotY, 0); //We are setting the rotation around X, Y, Z axis respectively
-        }
-        else
-        {
-            newQ = Quaternion.Euler(swipeDirection.y, -swipeDirection.x, 0);
-        }
-        cameraRot = Quaternion.Slerp(cameraRot, newQ, slerpValue);  //let cameraRot value gradually reach newQ which corresponds to our touch
-        mainCamera.transform.position = target.position + cameraRot * dir ;
-        mainCamera.transform.LookAt(target.position);
+            Vector3 dir = new Vector3(-5, _distanceBetweenCameraAndTarget, -5); //assign value to the distance between the maincamera and the target
 
+            Quaternion newQ; // value equal to the delta change of our mouse or touch position
+            if (rotateMethod == RotateMethod.Mouse)
+            {
+                newQ = Quaternion.Euler(_rotX, _rotY, 0); //We are setting the rotation around X, Y, Z axis respectively
+            }
+            else
+            {
+                newQ = Quaternion.Euler(_swipeDirection.y, -_swipeDirection.x, 0);
+            }
+            _cameraRot = Quaternion.Slerp(_cameraRot, newQ, slerpValue);  //let cameraRot value gradually reach newQ which corresponds to our touch
+            mainCamera.transform.position = target.position + _cameraRot * dir ;
+            mainCamera.transform.LookAt(target.position);
+        }
     }
 
     public void SetCamPos()

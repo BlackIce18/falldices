@@ -43,8 +43,8 @@ public class PlayerCreator : MonoBehaviour
             /* GameObject textBlock = Instantiate(_uiTextBlock, _parentToSpawnTextBlocks);
              TextMeshProUGUI textBalance = textBlock.GetComponent<TextMeshProUGUI>();*/
             //GetComponent<Отдельный класс> у которого получаем textmesh
-            player.PlayerBalance.MoneyText = playerInfoUI.MoneyText;
-            player.PlayerBalance.Money = GameData.startMoney;
+            player.Balance.MoneyText = playerInfoUI.MoneyText;
+            player.Balance.Money = GameData.startMoney;
             player.Color = _playersPrefabs[i].playerMaterial.color;
 
 
@@ -70,11 +70,13 @@ public class PlayerCreator : MonoBehaviour
         playerInfoUI.Nickname.text = GameData.users[userIndex].nickname;
         playerInfoUI.Nickname.color = playerColor;
         playerInfoUI.MoneyText.text = GameData.startMoney.ToString();
+        playerInfoUI.PlayerIcon.sprite = GameData.users[userIndex].icon;
+        playerInfoUI.PlayerIcon.preserveAspect = true;
         /* GameObject textBlock = Instantiate(_uiTextBlock, _parentToSpawnTextBlocks);
          TextMeshProUGUI textBalance = textBlock.GetComponent<TextMeshProUGUI>();*/
         //GetComponent<Отдельный класс> у которого получаем textmesh
-        player.PlayerBalance.MoneyText = playerInfoUI.MoneyText;
-        player.PlayerBalance.Money = GameData.startMoney;
+        player.Balance.MoneyText = playerInfoUI.MoneyText;
+        player.Balance.Money = GameData.startMoney;
         player.Color = playerColor;
         player.NickName = GameData.users[userIndex].nickname;
 

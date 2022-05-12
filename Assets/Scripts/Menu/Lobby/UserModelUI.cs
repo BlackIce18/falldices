@@ -7,7 +7,7 @@ public class UserModelUI : MonoBehaviour
     [SerializeField] private UserModelItemUI[] _userModelsItemUI;
     [SerializeField] private UserModelItemUI _choosedUserModelItemUI;
     public UserModelItemUI ChoosedUserModelItemUI { get { return _choosedUserModelItemUI; } }
-
+    public UserModelItemUI[] UserModels => _userModelsItemUI;
     public void DisableToggles() 
     { 
         for(int i = 0; i < _userModelsItemUI.Length; i++)
@@ -19,5 +19,7 @@ public class UserModelUI : MonoBehaviour
     public void ChooseUserModel(UserModelItemUI userModelItemUI)
     {
         _choosedUserModelItemUI = userModelItemUI;
+        _choosedUserModelItemUI.EnableToggle();
     }
+
 }

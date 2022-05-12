@@ -4,7 +4,7 @@ public class PlayerBalance : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _moneyText;
     public TextMeshProUGUI MoneyText { get { return _moneyText; } set { _moneyText = value; } }
-    private int _money;
+    [SerializeField] private int _money;
     public int Money
     {
         get { return _money; }

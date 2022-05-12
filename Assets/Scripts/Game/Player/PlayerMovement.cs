@@ -82,7 +82,6 @@ public class PlayerMovement : MonoBehaviour
 
     public IEnumerator Move(int movesCount)
     {
-        RotateGameScene.ProhibitRotate();
         MovesCount = movesCount;
 
         while (MovesCount > 0)
@@ -119,11 +118,8 @@ public class PlayerMovement : MonoBehaviour
                 _player.Position++;
             }
 
-
             MovesCount--;
         }
-        RotateGameScene.AllowRotate();
-        GameField.gameFieldSingleton.ShowCellButton();
     }
 
 }

@@ -31,7 +31,6 @@ public class AuthManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _warningTextRegister;
 
     [SerializeField] private FirestoreDataBase _db;
-
     private void Awake()
     {
         FirebaseFirestore.DefaultInstance.Settings.PersistenceEnabled = false;

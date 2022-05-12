@@ -15,8 +15,8 @@ public class GameField : MonoBehaviour
 
     private int _activePlayerIndex = 0;
     [SerializeField] private Player _activePlayer;
-    [SerializeField] private TextMeshProUGUI _activePlayerNickname;
-    [SerializeField] private TextMeshProUGUI _activePlayerMoney;
+    public TextMeshProUGUI activePlayerNickname;
+    public TextMeshProUGUI activePlayerMoney;
 
     [SerializeField] private List<Player> _players = new List<Player>();
     [SerializeField] private List<PlayerInfoUI> _playersUIInfo = new List<PlayerInfoUI>();
@@ -27,6 +27,8 @@ public class GameField : MonoBehaviour
     private Dice _dice;
     private Timer _timer;
     public int FieldCellsCount => _fieldCells.Length;
+
+    public GameWindows gameWindows;
     private void Awake()
     {
         _dice = GetComponent<Dice>();
@@ -39,12 +41,15 @@ public class GameField : MonoBehaviour
         ChangeActivePlayer(_activePlayerIndex);
     }
 
-    public void ActivePlayerRollDices() 
+    public void ActivePlayerMove() 
     {
         _dice.ShowDices();
         HideActivePlayerInfo();
-        int[] values = _dice.RollDices();
-        _activePlayer.Move(values[0]+values[1]);
+        int dicesValue = _dice.RollDices();
+
+        StartCoroutine(_activePlayer.Move(dicesValue));
+
+        
         StartCoroutine(HideDices());
         _timer.ResetTimer();
         //NextPlayerTurn();
@@ -52,13 +57,13 @@ public class GameField : MonoBehaviour
 
     private void HideActivePlayerInfo()
     {
-        _activePlayerNickname.gameObject.SetActive(false);
-        _activePlayerMoney.gameObject.SetActive(false);
+        activePlayerNickname.gameObject.SetActive(false);
+        activePlayerMoney.gameObject.SetActive(false);
     }
     private void ShowActivePlayerInfo()
     {
-        _activePlayerNickname.gameObject.SetActive(true);
-        _activePlayerMoney.gameObject.SetActive(true);
+        activePlayerNickname.gameObject.SetActive(true);
+        activePlayerMoney.gameObject.SetActive(true);
     }
 
     private IEnumerator HideDices()
@@ -108,9 +113,9 @@ public class GameField : MonoBehaviour
     {
         _activePlayer = _players[index];
 
-        _activePlayerNickname.text = _activePlayer.NickName;
-        _activePlayerNickname.color = _playersUIInfo[index].Nickname.color;
-        _activePlayerMoney.text = _activePlayer.PlayerBalance.Money.ToString();
+        activePlayerNickname.text = _activePlayer.NickName;
+        activePlayerNickname.color = _playersUIInfo[index].Nickname.color;
+        activePlayerMoney.text = _activePlayer.Balance.Money.ToString();
         _skipButton.gameObject.SetActive(false);
         /*
         for(int i = 0; i < _playersUIInfo.Count; i++)
@@ -135,23 +140,29 @@ public class GameField : MonoBehaviour
 
     public bool ActivePlayerTryToBuyEnterprise(Enterprise enterprise)
     {
-        if(_fieldCells[_activePlayer.Position].IsAvailableToBuild == false)
+        if(GetActivePlayerCell().IsAvailableToBuild == false)
         {
             return false;
         }
         bool isBuyed = _activePlayer.TryToBuyEnterprise(enterprise);
         if (isBuyed)
         {
-            _fieldCells[_activePlayer.Position].IsAvailableToBuild = false;
-            _activePlayerMoney.text = _activePlayer.PlayerBalance.Money.ToString();
+            GetActivePlayerCell().IsAvailableToBuild = false;
+            GetActivePlayerCell().owner = _activePlayer;
+            GetActivePlayerCell().enterprise = enterprise;
+            activePlayerMoney.text = _activePlayer.Balance.Money.ToString();
         }
         return isBuyed;
     }
 
     public void ShowCellButton()
     {
-        _fieldCells[_activePlayer.Position].UIToShow.SetActive(true);
         _skipButton.gameObject.SetActive(true);
+        if(GetActivePlayerCell().IsAvailableToBuild == false && GetActivePlayerCell().enterprise.IsAvailable != false)
+        {
+            return;
+        }
+        GetActivePlayerCell().UIToShow.SetActive(true);
     }
 
     public FieldCell GetActivePlayerCell()
