@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0.99999946, b: 0.99999946, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1478,7 +1478,7 @@ RectTransform:
   - {fileID: 405432214}
   - {fileID: 790748358}
   m_Father: {fileID: 679533080}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -4342,7 +4342,7 @@ Transform:
   - {fileID: 1573077475}
   - {fileID: 1543812207}
   m_Father: {fileID: 679533080}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &391292484
 GameObject:
@@ -12241,7 +12241,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &679533080
 Transform:
   m_ObjectHideFlags: 0
@@ -12253,9 +12253,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 1820732461}
   - {fileID: 390224717}
   - {fileID: 137635850}
-  - {fileID: 1820732461}
   - {fileID: 1016702461}
   - {fileID: 1105585639}
   - {fileID: 935846235}
@@ -30137,6 +30137,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
@@ -34504,6 +34505,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _audioList:
   - {fileID: 8300000, guid: a73b50ea7984f3d45957d4c12cbe9497, type: 3}
+  - {fileID: 8300000, guid: 5e0e2d64ff0af2a4c8fba8b3f5d17007, type: 3}
+  - {fileID: 8300000, guid: b95f425f538326b43b6c85e0960d8488, type: 3}
+  - {fileID: 8300000, guid: cf772cf3949fa39468efd672450ce9ca, type: 3}
+  - {fileID: 8300000, guid: 612a37c3b8925e045b4612fd857463bd, type: 3}
   _musicSource: {fileID: 587527726}
   _soundSource: {fileID: 1303607102}
 --- !u!1 &1387889964
@@ -38596,7 +38601,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1820732458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38672,7 +38677,7 @@ RectTransform:
   - {fileID: 230359196}
   - {fileID: 480039731}
   m_Father: {fileID: 679533080}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}

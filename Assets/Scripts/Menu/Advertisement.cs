@@ -5,7 +5,7 @@ using System;
 public class Advertisement : MonoBehaviour
 {
     private RewardedAd _rewardedAd;
-    private string _adUnitId = "ca-app-pub-3940256099942544/5224354917";
+    private string _adUnitId = "ca-app-pub-4979558067985923~9037535547";
 
     private void Start()
     {

@@ -28,7 +28,7 @@ public class Lobby : MonoBehaviour
         for (int i = 0; i < _prepareSingleGame.PlayersCount; i++)
         {
             Color32 randomColor = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
-            AddPlayer("bot_" + i, randomColor, 0);
+            AddPlayer("player_" + i, randomColor, 0);
         }
     }
 }
