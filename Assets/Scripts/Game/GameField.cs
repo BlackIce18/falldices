@@ -3,15 +3,12 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using UnityEngine.UI;
+using System;
 
 [RequireComponent(typeof(Dice))]
-[RequireComponent(typeof(Timer))]
 public class GameField : MonoBehaviour
 {
     public static GameField gameFieldSingleton;
-
-    [SerializeField] private Bank _bank;
-    public Bank Bank { get { return _bank; }}
 
     private int _activePlayerIndex = 0;
     [SerializeField] private Player _activePlayer;
@@ -24,15 +21,16 @@ public class GameField : MonoBehaviour
     [SerializeField] private Color32 _playerInfoUIDefaultColor;
     [SerializeField] private FieldCell[] _fieldCells;
     [SerializeField] private Button _skipButton;
+    [SerializeField] private Game.UIButtons _uiButtons;
+    public int CircleMoneyForPlayer { get; } = 1000;
     private Dice _dice;
-    private Timer _timer;
     public int FieldCellsCount => _fieldCells.Length;
-
+    public Player ActivePlayer => _activePlayer;
     public GameWindows gameWindows;
+
     private void Awake()
     {
         _dice = GetComponent<Dice>();
-        _timer = GetComponent<Timer>();
         gameFieldSingleton = this;
     }
 
@@ -43,55 +41,53 @@ public class GameField : MonoBehaviour
 
     public void ActivePlayerMove() 
     {
+        if(ActivePlayer.CanMove == false) 
+        { 
+            return; 
+        }
+
         _dice.ShowDices();
-        HideActivePlayerInfo();
-        int dicesValue = _dice.RollDices();
-
-        StartCoroutine(_activePlayer.Move(dicesValue));
-
-        
-        StartCoroutine(HideDices());
-        _timer.ResetTimer();
-        //NextPlayerTurn();
+        int distance = _dice.RollDices();
+        StartCoroutine(MoveCoroutine(distance));
+        _dice.HideDicesAfterTime(2f);
     }
-
-    private void HideActivePlayerInfo()
+    private IEnumerator MoveCoroutine(int distance)
     {
-        activePlayerNickname.gameObject.SetActive(false);
-        activePlayerMoney.gameObject.SetActive(false);
-    }
-    private void ShowActivePlayerInfo()
-    {
-        activePlayerNickname.gameObject.SetActive(true);
-        activePlayerMoney.gameObject.SetActive(true);
-    }
-
-    private IEnumerator HideDices()
-    {
-        yield return new WaitForSeconds(2f);
-        _dice.HideDices();
-        yield return new WaitForSeconds(0.2f);
-        ShowActivePlayerInfo();
-    }
-
-    public Vector3 GetPointPosition(int pointNumber) 
-    {
-        if (pointNumber == FieldCellsCount) 
+        int startPosition = ActivePlayer.Position;
+        yield return ActivePlayer.Move(distance);
+        CheckNewCircle(startPosition, distance, FieldCellsCount);
+        if (ActivePlayer.fieldCell.owner == null)
         {
-            pointNumber -= FieldCellsCount;
+            ShowCellButton();
         }
-
-        return _fieldCells[pointNumber].transform.position;
+        else if (ActivePlayer.fieldCell.owner != null && ActivePlayer.fieldCell.owner != this)
+        {
+            ActivePlayer.Balance.AddMoney(-ActivePlayer.fieldCell.enterprise.CurrentRentPrice);
+            ActivePlayer.fieldCell.owner.Balance.AddMoney(ActivePlayer.fieldCell.enterprise.CurrentRentPrice);
+        }
     }
 
-    public PlayerAnimationDirection GetPointPlayerAnimationDirection(int pointNumber)
+    private bool CheckNewCircle(int currentPosition, int distance, int fieldSize) 
     {
-        if (pointNumber == FieldCellsCount)
+        Debug.Log(currentPosition+" "+distance+" "+fieldSize);
+        if (currentPosition + distance >= fieldSize)
         {
-            pointNumber -= FieldCellsCount;
+            ActivePlayer.Balance.AddMoney(CircleMoneyForPlayer);
+            activePlayerMoney.text = ActivePlayer.Balance.Money.ToString();
+            gameWindows.ShowWindow(WindowsEnum.NewCircle);
+            return true;
         }
+        return false;
+    }
 
-        return _fieldCells[pointNumber].Direction;
+    public FieldCell GetFieldCell(int index)
+    {
+        if(index <= -1 || index > FieldCellsCount)
+        {
+            throw new ArgumentOutOfRangeException();
+        } 
+
+        return _fieldCells[index];
     }
 
     public void AddNewPlayer(Player player)
@@ -106,27 +102,6 @@ public class GameField : MonoBehaviour
     
     public void NextPlayerTurn()
     {
-        ChangeActivePlayer(IncreaseActivePlayerIndex());
-    }
-
-    private void ChangeActivePlayer(int index)
-    {
-        _activePlayer = _players[index];
-
-        activePlayerNickname.text = _activePlayer.NickName;
-        activePlayerNickname.color = _playersUIInfo[index].Nickname.color;
-        activePlayerMoney.text = _activePlayer.Balance.Money.ToString();
-        _skipButton.gameObject.SetActive(false);
-        /*
-        for(int i = 0; i < _playersUIInfo.Count; i++)
-        {
-            _playersUIInfo[i].ChangeBackgroundColor(_playerInfoUIDefaultColor);
-        }
-        _playersUIInfo[index].ChangeBackgroundColor(_playerInfoUIActiveColor);*/
-    }
-
-    private int IncreaseActivePlayerIndex()
-    {
         if (_activePlayerIndex + 1 == _players.Count)
         {
             _activePlayerIndex = 0;
@@ -135,43 +110,56 @@ public class GameField : MonoBehaviour
         {
             _activePlayerIndex += 1;
         }
-        return _activePlayerIndex;
+
+        ActivePlayer.CanMove = true;
+        _uiButtons.Reset();
+        ChangeActivePlayer(_activePlayerIndex);
+    }
+
+    private void ChangeActivePlayer(int index)
+    {
+        _activePlayer = _players[index];
+
+        activePlayerNickname.text = ActivePlayer.NickName;
+        activePlayerNickname.color = _playersUIInfo[index].Nickname.color;
+        activePlayerMoney.text = ActivePlayer.Balance.Money.ToString();
+        /*
+        for(int i = 0; i < _playersUIInfo.Count; i++)
+        {
+            _playersUIInfo[i].ChangeBackgroundColor(_playerInfoUIDefaultColor);
+        }
+        _playersUIInfo[index].ChangeBackgroundColor(_playerInfoUIActiveColor);*/
     }
 
     public bool ActivePlayerTryToBuyEnterprise(Enterprise enterprise)
     {
-        if(GetActivePlayerCell().IsAvailableToBuild == false)
+        if (ActivePlayer.fieldCell.IsAvailableToBuild == false)
         {
             return false;
         }
-        bool isBuyed = _activePlayer.TryToBuyEnterprise(enterprise);
-        if (isBuyed)
+        if (enterprise.IsAvailable)
         {
-            GetActivePlayerCell().IsAvailableToBuild = false;
-            GetActivePlayerCell().owner = _activePlayer;
-            GetActivePlayerCell().enterprise = enterprise;
-            activePlayerMoney.text = _activePlayer.Balance.Money.ToString();
+            bool isBuyed = ActivePlayer.Balance.TryBuy(enterprise);
+            if (isBuyed)
+            {
+                ActivePlayer.Ownership.AddToOwn(enterprise);
+                enterprise.SetUnavailableToBuy();
+                ActivePlayer.fieldCell.BuildEnterprise(ActivePlayer, enterprise);
+                activePlayerMoney.text = ActivePlayer.Balance.Money.ToString();
+                return true;
+            }
         }
-        return isBuyed;
+        return false;
     }
 
     public void ShowCellButton()
     {
         _skipButton.gameObject.SetActive(true);
-        if(GetActivePlayerCell().IsAvailableToBuild == false && GetActivePlayerCell().enterprise.IsAvailable != false)
+        FieldCell activePlayerCell = ActivePlayer.fieldCell;
+        if (activePlayerCell.IsAvailableToBuild == false && activePlayerCell.enterprise.IsAvailable != false)
         {
             return;
         }
-        GetActivePlayerCell().UIToShow.SetActive(true);
-    }
-
-    public FieldCell GetActivePlayerCell()
-    {
-        return _fieldCells[_activePlayer.Position];
-    }
-
-    public Color32 GetActivePlayerColor()
-    {
-        return _activePlayer.Color;
+        activePlayerCell.UIToShow.SetActive(true);
     }
 }

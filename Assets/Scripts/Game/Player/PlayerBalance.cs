@@ -19,9 +19,10 @@ public class PlayerBalance : MonoBehaviour
         _moneyText.text = Money.ToString();
     }
 
-    public bool TryBuy(int price)
+    public bool TryBuy(Enterprise enterprise)
     {
-        if(Money - price >= 0) {
+        var price = enterprise.Price;
+        if (Money - price >= 0) {
             Money -= price;
             MoneyText.text = Money.ToString();
             return true; 

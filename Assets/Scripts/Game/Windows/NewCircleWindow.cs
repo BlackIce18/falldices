@@ -10,7 +10,7 @@ public class NewCircleWindow : Window, IShowWindow
     }
     public override void Show()
     {
-        SetText("+" + GameField.gameFieldSingleton.Bank.CircleMoneyForPlayer);
+        SetText("+" + GameField.gameFieldSingleton.CircleMoneyForPlayer);
     }
     private void SetText(string textToPlace)
     {

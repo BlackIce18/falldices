@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class Dice : MonoBehaviour
 {
@@ -29,6 +30,10 @@ public class Dice : MonoBehaviour
             _dicesModel[i].gameObject.SetActive(false);
         }
     }
+    public void HideDicesAfterTime(float time)
+    {
+        StartCoroutine(HideDicesAfterTimeCoroutine(time));
+    }
 
     public void ShowDices()
     {
@@ -36,5 +41,12 @@ public class Dice : MonoBehaviour
         {
             _dicesModel[i].gameObject.SetActive(true);
         }
+    }
+
+    private IEnumerator HideDicesAfterTimeCoroutine(float time)
+    {
+        yield return new WaitForSeconds(time);
+        HideDices();
+        yield return new WaitForSeconds(0.2f);
     }
 }

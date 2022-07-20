@@ -56,7 +56,6 @@ public class Enterprise
 }
 public class Enterprises : MonoBehaviour
 {
-    [SerializeField] private GameField _gameField;
     [SerializeField] private List<Enterprise> _enterprises = new List<Enterprise>();
     [SerializeField] private GameObject _UIPrefab;
     [SerializeField] private GameObject _buyWindow;
@@ -78,38 +77,9 @@ public class Enterprises : MonoBehaviour
         {
             enterprise.SetStartRentPrice();
             EnterprisePrefab enterprisePrefab = Instantiate(_UIPrefab, _parentUIPrefabs).GetComponent<EnterprisePrefab>();
-            enterprisePrefab.Image.sprite = enterprise.Sprite;
-            enterprisePrefab.PriceText.text = enterprise.Price.ToString();
-            enterprisePrefab.Name.text = enterprise.Name;
-            enterprisePrefab.Type.text = enterprise.Monopoly.MonopolyName;
-
-            for(int i = 0; i < enterprisePrefab.RentPrices.Length; i++)
-            {
-                enterprisePrefab.RentPrices[i].text = enterprise.Monopoly.RentPrice[i].ToString();
-            }
-
-            enterprisePrefab.DefaultRentPrice.text = enterprise.CurrentRentPrice.ToString();
-            enterprisePrefab.UpgradePrice.text = enterprise.Monopoly.PriceToUpgrade.ToString();
-
-            enterprisePrefab.Buy.onClick.AddListener(()=> {
-                if (_gameField.ActivePlayerTryToBuyEnterprise(enterprise))
-                {
-                    _gameField.ShowCellButton();
-                    enterprisePrefab.Buy.enabled = false;
-                    enterprisePrefab.PriceText.text = "Куплено";
-                    _buyWindow.SetActive(false);
-                    _buildButton.SetActive(false);
-                    RotateGameScene.AllowRotate();
-                    BuildEnterprise(enterprise);
-                }
-            });
+            enterprisePrefab.Init(enterprise);
+            enterprisePrefab.ButtonInit(enterprise, _buyWindow, _buildButton);
         }
     }
 
-    private void BuildEnterprise(Enterprise enterprise)
-    {
-        FieldCell activePlayerfieldCell = _gameField.GetActivePlayerCell();
-        Instantiate(enterprise.Prefab, activePlayerfieldCell.transform);
-        activePlayerfieldCell.TileObject.GetComponent<MeshRenderer>().material.color = _gameField.GetActivePlayerColor();
-    }
 }

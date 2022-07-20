@@ -18,7 +18,7 @@ public class PlayerCreator : MonoBehaviour
     [SerializeField] private GameObject _playerInfoPrefab;
     void Awake()
     {
-        for (int i = 0; i < GameData.users.Count; i++)
+        for (int i = 0; i < GameData.lobbyUsers.Count; i++)
         {
             Create(i);
         }
@@ -30,7 +30,7 @@ public class PlayerCreator : MonoBehaviour
         {
             GameObject playerPrefab = Instantiate(_playersPrefabs[i].playerPrefab, _parentToSpawnPlayers);
             Player player = playerPrefab.GetComponent<Player>();
-            player.transform.position = _gameField.GetPointPosition(0);
+            player.transform.position = _gameField.GetFieldCell(0).transform.position;
 
             Coloring playerColoring = playerPrefab.GetComponent<Coloring>();
             playerColoring.SetMaterials(_playersPrefabs[i].playerMaterial);
@@ -55,22 +55,19 @@ public class PlayerCreator : MonoBehaviour
 
     private void Create(int userIndex)
     {
-        GameObject playerPrefab = Instantiate(GameData.users[userIndex].model.Prefab, _parentToSpawnPlayers);
+        GameObject playerPrefab = Instantiate(GameData.lobbyUsers[userIndex].Model.Prefab, _parentToSpawnPlayers);
         Player player = playerPrefab.GetComponent<Player>();
-        player.transform.position = _gameField.GetPointPosition(0);
+        player.transform.position = _gameField.GetFieldCell(0).transform.position;
 
-        Coloring playerColoring = playerPrefab.GetComponent<Coloring>();
-        Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-        Color32 playerColor = GameData.users[userIndex].color;
-        material.color = playerColor;
-        playerColoring.SetMaterials(material);
+        Color32 playerColor = GameData.lobbyUsers[userIndex].Color;
+        playerPrefab.GetComponent<Coloring>().SetMaterials(CreateMaterial(playerColor));
 
         GameObject playerInfo = Instantiate(_playerInfoPrefab, _parentToSpawnplayerInfo);
         PlayerInfoUI playerInfoUI = playerInfo.GetComponent<PlayerInfoUI>();
-        playerInfoUI.Nickname.text = GameData.users[userIndex].nickname;
+        playerInfoUI.Nickname.text = GameData.lobbyUsers[userIndex].Nickname;
         playerInfoUI.Nickname.color = playerColor;
         playerInfoUI.MoneyText.text = GameData.startMoney.ToString();
-        playerInfoUI.PlayerIcon.sprite = GameData.users[userIndex].icon;
+        playerInfoUI.PlayerIcon.sprite = GameData.lobbyUsers[userIndex].Model.Sprite;
         playerInfoUI.PlayerIcon.preserveAspect = true;
         /* GameObject textBlock = Instantiate(_uiTextBlock, _parentToSpawnTextBlocks);
          TextMeshProUGUI textBalance = textBlock.GetComponent<TextMeshProUGUI>();*/
@@ -78,9 +75,16 @@ public class PlayerCreator : MonoBehaviour
         player.Balance.MoneyText = playerInfoUI.MoneyText;
         player.Balance.Money = GameData.startMoney;
         player.Color = playerColor;
-        player.NickName = GameData.users[userIndex].nickname;
+        player.NickName = playerInfoUI.Nickname.text;
 
         _gameField.AddNewPlayerUIInfo(playerInfoUI);
         _gameField.AddNewPlayer(player);
+    }
+
+    private Material CreateMaterial(Color32 color)
+    {
+        Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        material.color = color;
+        return material;
     }
 }

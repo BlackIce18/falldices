@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.Events;
 
 public class Timer : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Timer : MonoBehaviour
     [SerializeField] private Color _warningColor;
     [SerializeField] private int _warningTime = 10;
 
+    public UnityEvent onTimeEnd;
 
     private int TimeToNextTurn 
     {
@@ -34,6 +36,10 @@ public class Timer : MonoBehaviour
         CountingTimer = _timeToNextTurn;
         StartCoroutine(TimerCoroutine());
     }
+    private void SetColor(Color newColor)
+    {
+        _text.color = newColor;
+    }
 
     public void ResetTimer()
     {
@@ -41,12 +47,7 @@ public class Timer : MonoBehaviour
         CountingTimer = TimeToNextTurn;
     }
 
-    private void SetColor(Color newColor)
-    {
-        _text.color = newColor;
-    }
-
-    IEnumerator TimerCoroutine() {
+    private IEnumerator TimerCoroutine() {
         if (CountingTimer == _warningTime)
         {
             SetColor(_warningColor);
@@ -54,6 +55,7 @@ public class Timer : MonoBehaviour
 
         if (CountingTimer <= 0)
         {
+            onTimeEnd.Invoke();
             ResetTimer();
             StopCoroutine("TimerCoroutine");
         }

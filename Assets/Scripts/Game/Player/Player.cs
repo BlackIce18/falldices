@@ -19,6 +19,7 @@ public class Player : MonoBehaviour
     [SerializeField] private string _nickname = "";
     public string NickName { get { return _nickname; } set { _nickname = value; } }
     private bool _isBankrupt = false;
+    private bool _canMove = true;
 
     private PlayerBalance _balance;
     private PlayerMovement _movement;
@@ -32,25 +33,22 @@ public class Player : MonoBehaviour
         get { return _position; }
         set 
         {
-            try
+            if (value <= -1)
             {
-                if (value < -1)
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
-
-                if (value >= -1)
-                {
-                    _position = value;
-                }
+                _position = GameField.gameFieldSingleton.FieldCellsCount - 1;
             }
-            catch (ArgumentOutOfRangeException argumentException) 
+            else if (value >= 0 && value < GameField.gameFieldSingleton.FieldCellsCount)
             {
-                Debug.Log("Значение должно быть 0 или выше");
+                _position = value;
             }
-               
+            else if (value >= GameField.gameFieldSingleton.FieldCellsCount)
+            {
+                _position = 0;
+            }
         } 
     }
+
+    public FieldCell fieldCell;
 
     public PlayerBalance Balance
     {
@@ -58,6 +56,7 @@ public class Player : MonoBehaviour
         set { _balance = value; }
     }
     public PlayerOwnership Ownership => _ownership;
+    public bool CanMove {get { return _canMove;} set { _canMove = value; } }
     public Color32 Color
     {
         get { return _color; }
@@ -71,50 +70,28 @@ public class Player : MonoBehaviour
         _ownership = GetComponent<PlayerOwnership>();
     }
 
-    public IEnumerator Move(int movesCount) 
+    public Coroutine Move(int distance)
+    {
+        return StartCoroutine(MoveCoroutine(distance));
+    }
+    public Coroutine MoveBack(int distance)
+    {
+        return StartCoroutine(MoveBackCoroutine(distance));
+    }
+    private IEnumerator MoveCoroutine(int distance) 
     {
         int startPosition = Position;
-        yield return StartCoroutine(_movement.Move(movesCount));
-        yield return StartCoroutine(WorkWithPlayerPositionAndBalance(startPosition, movesCount));
+        yield return StartCoroutine(_movement.Move(distance));
+        fieldCell = GameField.gameFieldSingleton.GetFieldCell(Position);
+        //yield return StartCoroutine(WorkWithPlayerPositionAndBalance(startPosition, movesCount));
+        CanMove = false;
     }
-
-    private IEnumerator WorkWithPlayerPositionAndBalance(int startPosition, int movesCount)
+    private IEnumerator MoveBackCoroutine(int distance)
     {
-        FieldCell fieldCell = GameField.gameFieldSingleton.GetActivePlayerCell();
-        int fieldSize = GameField.gameFieldSingleton.FieldCellsCount;
-        if (startPosition + movesCount >= fieldSize)
-        {
-            Bank bank = GameField.gameFieldSingleton.Bank;
-            Balance.AddMoney(bank.CircleMoneyForPlayer);
-            GameField.gameFieldSingleton.activePlayerMoney.text = Balance.Money.ToString();
-            bank.AddMoneyToPlayerBalance(Balance, bank.CircleMoneyForPlayer);
-            GameField.gameFieldSingleton.gameWindows.ShowWindow(WindowsEnum.NewCircle);
-        }
-
-        if(fieldCell.owner == null)
-        {
-            GameField.gameFieldSingleton.ShowCellButton();
-        }
-        else if (fieldCell.owner != null && fieldCell.owner != this)
-        {
-            Balance.AddMoney(-fieldCell.enterprise.CurrentRentPrice);
-            fieldCell.owner.Balance.AddMoney(fieldCell.enterprise.CurrentRentPrice);
-        }
-        yield return fieldCell;
-    }
-
-    public bool TryToBuyEnterprise(Enterprise enterprise)
-    {
-        if (enterprise.IsAvailable)
-        {
-            bool isBuyed = _balance.TryBuy(enterprise.Price);
-            if (isBuyed)
-            {
-                _ownership.AddToOwn(enterprise);
-                enterprise.SetUnavailableToBuy();
-                return true;
-            }
-        }
-        return false;
+        int startPosition = Position;
+        yield return StartCoroutine(_movement.MoveBack(distance));
+        //yield return StartCoroutine(WorkWithPlayerPositionAndBalance(startPosition, movesCount));
+        CanMove = false;
+        fieldCell = GameField.gameFieldSingleton.GetFieldCell(Position);
     }
 }

@@ -86,37 +86,81 @@ public class PlayerMovement : MonoBehaviour
 
         while (MovesCount > 0)
         {
-            PlayerAnimationDirection direction = GameField.gameFieldSingleton.GetPointPlayerAnimationDirection(_player.Position);
+            PlayerAnimationDirection direction = GameField.gameFieldSingleton.GetFieldCell(_player.Position).Direction;
 
-            Vector3 playerPosition = _player.transform.localPosition;
-            Vector3 nextPointPosition = GameField.gameFieldSingleton.GetPointPosition(_player.Position + 1);
+            Vector3 playerLocalPosition = _player.transform.localPosition;
+            _player.Position++;
+            Vector3 nextPointPosition = GameField.gameFieldSingleton.GetFieldCell(_player.Position).transform.position;
 
             if (direction == PlayerAnimationDirection.Up)
             {
-                yield return StartCoroutine(UpMoveAnimation(playerPosition, nextPointPosition));
+                yield return StartCoroutine(UpMoveAnimation(playerLocalPosition, nextPointPosition));
             }
             else if (direction == PlayerAnimationDirection.Right)
             {
-                yield return StartCoroutine(RightMoveAnimation(playerPosition, nextPointPosition));
+                yield return StartCoroutine(RightMoveAnimation(playerLocalPosition, nextPointPosition));
             }
             else if (direction == PlayerAnimationDirection.Down)
             {
-                yield return StartCoroutine(DownMoveAnimation(playerPosition, nextPointPosition));
+                yield return StartCoroutine(DownMoveAnimation(playerLocalPosition, nextPointPosition));
             }
             else if (direction == PlayerAnimationDirection.Left)
             {
-                yield return StartCoroutine(LeftMoveAnimation(playerPosition, nextPointPosition));
+                yield return StartCoroutine(LeftMoveAnimation(playerLocalPosition, nextPointPosition));
             }
 
 
-            if (_player.Position + 1 >= GameField.gameFieldSingleton.FieldCellsCount)
+           /* if (_player.Position + 1 >= GameField.gameFieldSingleton.FieldCellsCount)
             {
                 _player.Position = 0;
             }
             else 
             {
                 _player.Position++;
+            }*/
+
+            MovesCount--;
+        }
+    }
+
+    public IEnumerator MoveBack(int movesCount)
+    {
+        MovesCount = movesCount;
+
+        while (MovesCount > 0)
+        {
+            PlayerAnimationDirection direction = GameField.gameFieldSingleton.GetFieldCell(_player.Position).Direction;
+
+            Vector3 playerLocalPosition = _player.transform.localPosition;
+            _player.Position--;
+            Vector3 nextPointPosition = GameField.gameFieldSingleton.GetFieldCell(_player.Position).transform.position;
+
+            if (direction == PlayerAnimationDirection.Up)
+            {
+                yield return StartCoroutine(DownMoveAnimation(playerLocalPosition, nextPointPosition));
             }
+            else if (direction == PlayerAnimationDirection.Right)
+            {
+                yield return StartCoroutine(LeftMoveAnimation(playerLocalPosition, nextPointPosition));
+            }
+            else if (direction == PlayerAnimationDirection.Down)
+            {
+                yield return StartCoroutine(UpMoveAnimation(playerLocalPosition, nextPointPosition));
+            }
+            else if (direction == PlayerAnimationDirection.Left)
+            {
+                yield return StartCoroutine(RightMoveAnimation(playerLocalPosition, nextPointPosition));
+            }
+
+
+            /*if (_player.Position - 1 == -1)
+            {
+                _player.Position = GameField.gameFieldSingleton.FieldCellsCount - 1;
+            }
+            else
+            {
+                _player.Position--;
+            }*/
 
             MovesCount--;
         }
