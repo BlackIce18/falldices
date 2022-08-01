@@ -13,7 +13,8 @@ public abstract class Window : MonoBehaviour, IShowWindow
 public enum WindowsEnum
 {
     NewCircle = 0,
-    BankRobbery = 1
+    BankRobbery = 1,
+    Chance = 2
 }
 [Serializable]
 public struct WindowsNameStruct {

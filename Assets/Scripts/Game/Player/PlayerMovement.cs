@@ -3,10 +3,8 @@ using System;
 using UnityEngine;
 using DG.Tweening;
 
-[RequireComponent(typeof(Player))]
 public class PlayerMovement : MonoBehaviour
 {
-    private Player _player;
     private int _movesLeft = 0; // Осталось ходов
 
     public int MovesCount 
@@ -32,10 +30,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-    private void Awake()
-    {
-        _player = GetComponent<Player>();
-    }
+
     // Анимация перемещения вверх 
     IEnumerator UpMoveAnimation(Vector3 playerPosition, Vector3 nextPointPosition)
     {
@@ -80,17 +75,18 @@ public class PlayerMovement : MonoBehaviour
         yield return myTween.WaitForCompletion();
     }
 
-    public IEnumerator Move(int movesCount)
+    public IEnumerator Move(Player player, int movesCount)
     {
         MovesCount = movesCount;
 
         while (MovesCount > 0)
         {
-            PlayerAnimationDirection direction = GameField.gameFieldSingleton.GetFieldCell(_player.Position).Direction;
+            PlayerAnimationDirection direction = player.currentCell.Direction;
 
-            Vector3 playerLocalPosition = _player.transform.localPosition;
-            _player.Position++;
-            Vector3 nextPointPosition = GameField.gameFieldSingleton.GetFieldCell(_player.Position).transform.position;
+            Vector3 playerLocalPosition = player.transform.localPosition;
+            FieldCell nextCell = GameController.Singleton.GetFieldCell(player.Position + 1);
+            Vector3 nextPointPosition = nextCell.transform.position;
+            Debug.Log(player.Position);
 
             if (direction == PlayerAnimationDirection.Up)
             {
@@ -109,31 +105,25 @@ public class PlayerMovement : MonoBehaviour
                 yield return StartCoroutine(LeftMoveAnimation(playerLocalPosition, nextPointPosition));
             }
 
-
-           /* if (_player.Position + 1 >= GameField.gameFieldSingleton.FieldCellsCount)
-            {
-                _player.Position = 0;
-            }
-            else 
-            {
-                _player.Position++;
-            }*/
-
+            player.Position += 1;
+            player.currentCell = nextCell;
             MovesCount--;
         }
+        player.CanMove = false;
     }
 
-    public IEnumerator MoveBack(int movesCount)
+    public IEnumerator MoveBack(Player player, int movesCount)
     {
         MovesCount = movesCount;
 
         while (MovesCount > 0)
         {
-            PlayerAnimationDirection direction = GameField.gameFieldSingleton.GetFieldCell(_player.Position).Direction;
+            PlayerAnimationDirection direction = player.currentCell.Direction;
 
-            Vector3 playerLocalPosition = _player.transform.localPosition;
-            _player.Position--;
-            Vector3 nextPointPosition = GameField.gameFieldSingleton.GetFieldCell(_player.Position).transform.position;
+            Vector3 playerLocalPosition = player.transform.localPosition;
+            FieldCell previousCell = GameController.Singleton.GetFieldCell(player.Position - 1);
+            Vector3 nextPointPosition = previousCell.transform.position;
+            Debug.Log(player.Position);
 
             if (direction == PlayerAnimationDirection.Up)
             {
@@ -152,18 +142,10 @@ public class PlayerMovement : MonoBehaviour
                 yield return StartCoroutine(RightMoveAnimation(playerLocalPosition, nextPointPosition));
             }
 
-
-            /*if (_player.Position - 1 == -1)
-            {
-                _player.Position = GameField.gameFieldSingleton.FieldCellsCount - 1;
-            }
-            else
-            {
-                _player.Position--;
-            }*/
-
+            player.Position -= 1;
+            player.currentCell = previousCell;
             MovesCount--;
         }
+        player.CanMove = false;
     }
-
 }

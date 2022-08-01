@@ -33,18 +33,18 @@ public class EnterprisePrefab : MonoBehaviour
     public void ButtonInit(Enterprise enterprise, GameObject buyWindow, GameObject buildButton)
     {
         _buy.onClick.AddListener(() => {
-            if (GameField.gameFieldSingleton.ActivePlayerTryToBuyEnterprise(enterprise))
+            Player activePlayer = PlayerController.Singleton.ActivePlayer;
+            if (activePlayer.TryToBuyEnterprise(enterprise))
             {
-                //GameField.gameFieldSingleton.ShowCellButton();
                 _buy.enabled = false;
-                _priceText.text = "Куплено";
+                _priceText.text = "Куплено"; // Поменять!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 buyWindow.SetActive(false);
                 buildButton.SetActive(false);
                 RotateGameScene.AllowRotate();
 
-                Player activePlayer = GameField.gameFieldSingleton.ActivePlayer;
-                Instantiate(enterprise.Prefab, activePlayer.fieldCell.transform);
-                activePlayer.fieldCell.TileObject.GetComponent<MeshRenderer>().material.color = activePlayer.Color;
+                
+                Instantiate(enterprise.Prefab, activePlayer.currentCell.transform);
+                activePlayer.currentCell.TileObject.GetComponent<MeshRenderer>().material.color = activePlayer.Color;
             }
         });
     }

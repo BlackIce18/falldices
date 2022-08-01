@@ -1,8 +1,10 @@
 using UnityEngine;
 using TMPro;
+
 public class PlayerBalance : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _moneyText;
+    public PlayerInfoUI infoUI { get; set; }
     public TextMeshProUGUI MoneyText { get { return _moneyText; } set { _moneyText = value; } }
     [SerializeField] private int _money;
     public int Money
@@ -16,15 +18,15 @@ public class PlayerBalance : MonoBehaviour
     public void AddMoney(int money)
     {
         Money += money;
-        _moneyText.text = Money.ToString();
+        MoneyText.text = Money.ToString();
+        infoUI.MoneyText.text = Money.ToString();
     }
 
     public bool TryBuy(Enterprise enterprise)
     {
         var price = enterprise.Price;
         if (Money - price >= 0) {
-            Money -= price;
-            MoneyText.text = Money.ToString();
+            AddMoney(-price);
             return true; 
         }
         return false;

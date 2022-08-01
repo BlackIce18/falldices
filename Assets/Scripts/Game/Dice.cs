@@ -8,11 +8,16 @@ public class Dice : MonoBehaviour
 
     private int RollDice() 
     {
-        return Random.Range(1, 7);
+        return 4;
+        Debug.Log("Debgug Dice 11");
+        //return Random.Range(1, 7);
     }
 
     public int RollDices() 
     {
+        float timeToHide = 2f;
+        ShowDices();
+        HideDicesAfterTime(timeToHide);
         int[] array = new int[2];
         array[0] = RollDice();
         array[1] = RollDice();
@@ -23,19 +28,19 @@ public class Dice : MonoBehaviour
         return array[0]+array[1];
     }
 
-    public void HideDices()
+    private void HideDices()
     {
         for(int i = 0; i < _dicesModel.Length; i++)
         {
             _dicesModel[i].gameObject.SetActive(false);
         }
     }
-    public void HideDicesAfterTime(float time)
+    private void HideDicesAfterTime(float time)
     {
         StartCoroutine(HideDicesAfterTimeCoroutine(time));
     }
 
-    public void ShowDices()
+    private void ShowDices()
     {
         for (int i = 0; i < _dicesModel.Length; i++)
         {

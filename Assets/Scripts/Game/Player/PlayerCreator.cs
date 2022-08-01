@@ -13,9 +13,10 @@ public class PlayerCreator : MonoBehaviour
     [SerializeField] private Transform _parentToSpawnPlayers;
     [SerializeField] private GameObject _uiTextBlock;
     [SerializeField] private Transform _parentToSpawnTextBlocks;
-    [SerializeField] private GameField _gameField;
+    [SerializeField] private PlayerController _playerController;
     [SerializeField] private Transform _parentToSpawnplayerInfo;
     [SerializeField] private GameObject _playerInfoPrefab;
+    [SerializeField] private Transform _spawnPosition;
     void Awake()
     {
         for (int i = 0; i < GameData.lobbyUsers.Count; i++)
@@ -24,43 +25,10 @@ public class PlayerCreator : MonoBehaviour
         }
     }
 
-    private void Create()
-    {
-        for(int i = 0; i < _playersPrefabs.Length; i++)
-        {
-            GameObject playerPrefab = Instantiate(_playersPrefabs[i].playerPrefab, _parentToSpawnPlayers);
-            Player player = playerPrefab.GetComponent<Player>();
-            player.transform.position = _gameField.GetFieldCell(0).transform.position;
-
-            Coloring playerColoring = playerPrefab.GetComponent<Coloring>();
-            playerColoring.SetMaterials(_playersPrefabs[i].playerMaterial);
-
-            GameObject playerInfo = Instantiate(_playerInfoPrefab, _parentToSpawnplayerInfo);
-            PlayerInfoUI playerInfoUI = playerInfo.GetComponent<PlayerInfoUI>();
-            playerInfoUI.Nickname.text = player.NickName;
-            playerInfoUI.MoneyText.text = GameData.startMoney.ToString();
-            playerInfoUI.Nickname.color = _playersPrefabs[i].playerMaterial.color;
-            /* GameObject textBlock = Instantiate(_uiTextBlock, _parentToSpawnTextBlocks);
-             TextMeshProUGUI textBalance = textBlock.GetComponent<TextMeshProUGUI>();*/
-            //GetComponent<Отдельный класс> у которого получаем textmesh
-            player.Balance.MoneyText = playerInfoUI.MoneyText;
-            player.Balance.Money = GameData.startMoney;
-            player.Color = _playersPrefabs[i].playerMaterial.color;
-
-
-            _gameField.AddNewPlayerUIInfo(playerInfoUI);
-            _gameField.AddNewPlayer(player);
-        }
-    }
-
     private void Create(int userIndex)
     {
-        GameObject playerPrefab = Instantiate(GameData.lobbyUsers[userIndex].Model.Prefab, _parentToSpawnPlayers);
-        Player player = playerPrefab.GetComponent<Player>();
-        player.transform.position = _gameField.GetFieldCell(0).transform.position;
 
         Color32 playerColor = GameData.lobbyUsers[userIndex].Color;
-        playerPrefab.GetComponent<Coloring>().SetMaterials(CreateMaterial(playerColor));
 
         GameObject playerInfo = Instantiate(_playerInfoPrefab, _parentToSpawnplayerInfo);
         PlayerInfoUI playerInfoUI = playerInfo.GetComponent<PlayerInfoUI>();
@@ -72,13 +40,17 @@ public class PlayerCreator : MonoBehaviour
         /* GameObject textBlock = Instantiate(_uiTextBlock, _parentToSpawnTextBlocks);
          TextMeshProUGUI textBalance = textBlock.GetComponent<TextMeshProUGUI>();*/
         //GetComponent<Отдельный класс> у которого получаем textmesh
+        GameObject playerPrefab = Instantiate(GameData.lobbyUsers[userIndex].Model.Prefab, _parentToSpawnPlayers);
+        playerPrefab.GetComponent<Coloring>().SetMaterials(CreateMaterial(playerColor));
+        Player player = playerPrefab.GetComponent<Player>();
+        player.transform.position = _spawnPosition.position;
+        player.Balance.infoUI = playerInfoUI;
         player.Balance.MoneyText = playerInfoUI.MoneyText;
         player.Balance.Money = GameData.startMoney;
         player.Color = playerColor;
         player.NickName = playerInfoUI.Nickname.text;
-
-        _gameField.AddNewPlayerUIInfo(playerInfoUI);
-        _gameField.AddNewPlayer(player);
+        player.currentCell = GameController.Singleton.GetFieldCell(0);
+        _playerController.AddNewPlayer(player);
     }
 
     private Material CreateMaterial(Color32 color)

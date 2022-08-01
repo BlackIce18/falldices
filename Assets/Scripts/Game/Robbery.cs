@@ -8,13 +8,14 @@ public class Robbery
     private int _maxChancePercantage = 70;
     private int _bet = 2000;
     private int _multiplier = 2;
+
     public int GenerateRobberyChance()
     {
         _robberyChance = Random.Range(_startChancePercantage, _maxChancePercantage);
         return _robberyChance;
     }
 
-    public void StartRobbery(Player player)
+    public void StartRobbery(Player player, int jailCeilNumber)
     {
         if(player.Balance.Money >= _bet)
         {
@@ -27,7 +28,8 @@ public class Robbery
             }
             else
             {
-                //StartCoroutine(player.Move(1));
+                player.MoveBack(jailCeilNumber);
+                player.ChangeStatusToPrisoner();
             }
         }
         else
